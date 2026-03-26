@@ -8459,48 +8459,44 @@ function Library:CreateWindow(WindowInfo)
             end
         end))
     end
-    if WindowInfo.EnableCompacting and WindowInfo.SidebarCompacted then
-        Window:SetSidebarWidth(WindowInfo.SidebarCompactWidth)
-    end
-    if WindowInfo.AutoShow then
-        task.spawn(Library.Toggle)
-    end
+if Library.IsMobile then
+    local ToggleButton = Library:AddDraggableButton("Toggle", function()
+        Library:Toggle()
+    end, true)
 
-    if Library.IsMobile then
-        local ToggleButton = Library:AddDraggableButton("Toggle", function()
-            Library:Toggle()
-        end, true)
+    local LockButton = Library:AddDraggableButton("", function(self)
+        Library.CantDragForced = not Library.CantDragForced
 
-        local LockButton = Library:AddDraggableButton("", function(self)
-    Library.CantDragForced = not Library.CantDragForced
-
-    if Library.CantDragForced then
-        self:SetIcon("lock-keyhole-open")
-        self.IconColor = Color3.fromRGB(0, 255, 0)
-    else
-        self:SetIcon("lock")
-        self.IconColor = Color3.fromRGB(255, 0, 0)
-    end
-end, true)
-
-if Library.CantDragForced then
-    LockButton:SetIcon("lock-keyhole-open")
-    LockButton.IconColor = Color3.fromRGB(0, 255, 0)
-else
-    LockButton:SetIcon("lock")
-    LockButton.IconColor = Color3.fromRGB(255, 0, 0)
-end
-
-        if WindowInfo.MobileButtonsSide == "Right" then
-            ToggleButton.Button.Position = UDim2.new(1, -6, 0, 6)
-            ToggleButton.Button.AnchorPoint = Vector2.new(1, 0)
-
-            LockButton.Button.Position = UDim2.new(1, -6, 0, 46)
-            LockButton.Button.AnchorPoint = Vector2.new(1, 0)
+        if Library.CantDragForced then
+            self:SetIcon("lock-keyhole-open") -- Lucid já tem esse
+            self.IconColor = Color3.fromRGB(0, 255, 0)
         else
-            LockButton.Button.Position = UDim2.fromOffset(6, 46)
+            self:SetIcon("lock") -- Lucid já tem esse
+            self.IconColor = Color3.fromRGB(255, 0, 0)
         end
+    end, true)
+
+    -- Estado inicial
+    if Library.CantDragForced then
+        LockButton:SetIcon("lock-keyhole-open")
+        LockButton.IconColor = Color3.fromRGB(0, 255, 0)
+    else
+        LockButton:SetIcon("lock")
+        LockButton.IconColor = Color3.fromRGB(255, 0, 0)
     end
+
+    -- Ajuste de posição no mobile
+    if WindowInfo.MobileButtonsSide == "Right" then
+        ToggleButton.Button.Position = UDim2.new(1, -6, 0, 6)
+        ToggleButton.Button.AnchorPoint = Vector2.new(1, 0)
+
+        LockButton.Button.Position = UDim2.new(1, -6, 0, 46)
+        LockButton.Button.AnchorPoint = Vector2.new(1, 0)
+    else
+        ToggleButton.Button.Position = UDim2.fromOffset(6, 6)
+        LockButton.Button.Position = UDim2.fromOffset(6, 46)
+    end
+end
 
     --// Execution \\--
     SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
